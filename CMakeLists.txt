@@ -15,11 +15,18 @@ configure_file(version.h.in version.h)
 
 find_package(OpenGL REQUIRED)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include ${CMAKE_CURRENT_SOURCE_DIR}/external/stb})
+include_directories(${CMAKE_SOURCE_DIR}/external/glad/include ${CMAKE_SOURCE_DIR}/external/stb})
 
 file(GLOB BUTTERFLIES_SOURCES_C ${CMAKE_CURRENT_SOURCE_DIR} *.c external/glad/src/gl.c)
 
+add_subdirectory(foundation)
+
 add_executable(${PROJECT_NAME} "src/main.cpp")
+
+target_link_libraries(${PROJECT_NAME} PUBLIC foundation)
+
+target_sources(${PROJECT_NAME} PRIVATE external/glad/src/gl.c)
+set_source_files_properties(external/glad/src/gl.c PROPERTIES LANGUAGE C)
 
 include(FetchContent)
 FetchContent_Declare(
