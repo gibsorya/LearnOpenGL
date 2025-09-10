@@ -55,7 +55,11 @@ int main(int argc, char **argv) {
     }
 
     // Fence Sync Object
-    GLsync fence = glFenceSync(GL_SYNC_FENCE, 0);
+    GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+
+    // Inserts a "fence" into the command stream. Allows the CPU to "wait" for the GPU to finish commands.
+    // The CPU "waits" for the GPU when glCientWaitSync or glWaitSync is called. This is great for multi-threading.
+    // A fence blocks a CPU thread until the GPU commands are done executing.
 
     SDL_Event event;
 
