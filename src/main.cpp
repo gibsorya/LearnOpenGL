@@ -1,8 +1,13 @@
+#include "SDL3/SDL_video.h"
+#include "pipeline.h"
 #include "version.h"
 
 #include <glad/gl.h>
 
 #include "error.h"
+#include "shader.h"
+#include "vbo.h"
+#include "vao.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -11,9 +16,11 @@
 
 #include <iostream>
 
-GLfloat vertices[] = {-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,
-                      0.5f,  -0.5f * float(sqrt(3)) / 3, 0.0f,
-                      0.0f,  0.5f * float(sqrt(3)) / 3,  0.0f};
+// clang-format off
+GLfloat vertices[] = {-0.5f, -0.5f, 0.0f,
+                      0.5f,  -0.5f, 0.0f,
+                      0.0f,  0.5f,  0.0f};
+// clang-format on
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -54,15 +61,34 @@ int main(int argc, char **argv) {
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     }
 
+    std::cout << "Running shaders..." << "\n";
+
+
+    Shader vertexShader("default.vert", GL_VERTEX_SHADER);
+    Shader fragmentShader("default.frag", GL_FRAGMENT_SHADER);
+    
+    std::cout << "Creating pipeline..." << "\n";
+    Pipeline pipeline(vertexShader.ID, fragmentShader.ID);
     // Fence Sync Object
     GLsync fence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 
     // Inserts a "fence" into the command stream. Allows the CPU to "wait" for the GPU to finish commands.
     // The CPU "waits" for the GPU when glCientWaitSync or glWaitSync is called. This is great for multi-threading.
     // A fence blocks a CPU thread until the GPU commands are done executing.
+    
+    // VAO + VBO
+    VBO VBO(vertices, sizeof(vertices));
+    VAO VAO;
+    VAO.Bind();
+
+    VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+    VAO.Unbind();
+    VBO.Unbind();
 
     SDL_Event event;
 
+    
     while (!done) {
         while (SDL_PollEvent(&event) != 0) {
             if (event.type == SDL_EVENT_QUIT) {
@@ -70,10 +96,23 @@ int main(int argc, char **argv) {
                 break;
             }
         }
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        pipeline.Bind();
+        VAO.Bind();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        SDL_GL_SwapWindow(window);
     }
 
     glDeleteSync(fence);
-
+    VBO.Destroy();
+    VAO.Destroy();
+    pipeline.DestroyPipeline();
+    fragmentShader.Destroy();
+    vertexShader.Destroy();
     SDL_DestroyWindow(window);
 
     SDL_Quit();

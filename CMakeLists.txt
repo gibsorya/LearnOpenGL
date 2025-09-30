@@ -25,6 +25,14 @@ add_executable(${PROJECT_NAME} "src/main.cpp")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC foundation)
 
+# Define a variable for the shader directory relative to the source
+set(SHADERS_DIR "${CMAKE_SOURCE_DIR}/src/shaders")
+
+# Add a definition for the C++ code to use
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    SHADERS_DIR="${SHADERS_DIR}"
+)
+
 target_sources(${PROJECT_NAME} PRIVATE external/glad/src/gl.c)
 set_source_files_properties(external/glad/src/gl.c PROPERTIES LANGUAGE C)
 
