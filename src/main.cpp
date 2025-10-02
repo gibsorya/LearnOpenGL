@@ -1,4 +1,3 @@
-#include "SDL3/SDL_video.h"
 #include "pipeline.h"
 #include "version.h"
 
@@ -8,6 +7,7 @@
 #include "shader.h"
 #include "vbo.h"
 #include "vao.h"
+#include "ebo.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -17,9 +17,17 @@
 #include <iostream>
 
 // clang-format off
-GLfloat vertices[] = {-0.5f, -0.5f, 0.0f,
-                      0.5f,  -0.5f, 0.0f,
-                      0.0f,  0.5f,  0.0f};
+GLfloat vertices[] = {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
+};
+
+GLuint indices[] = {
+    0, 1, 3,
+    1, 2, 3
+};
 // clang-format on
 
 int main(int argc, char **argv) {
@@ -77,14 +85,16 @@ int main(int argc, char **argv) {
     // A fence blocks a CPU thread until the GPU commands are done executing.
     
     // VAO + VBO
-    VBO VBO(vertices, sizeof(vertices));
     VAO VAO;
     VAO.Bind();
+    VBO VBO(vertices, sizeof(vertices));
+    EBO EBO(indices, sizeof(indices));
 
     VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
 
     VAO.Unbind();
     VBO.Unbind();
+    EBO.Unbind();
 
     SDL_Event event;
 
@@ -92,6 +102,7 @@ int main(int argc, char **argv) {
     while (!done) {
         while (SDL_PollEvent(&event) != 0) {
             if (event.type == SDL_EVENT_QUIT) {
+                std::cout << "DONE" << "\n";
                 done = true;
                 break;
             }
@@ -102,7 +113,7 @@ int main(int argc, char **argv) {
 
         pipeline.Bind();
         VAO.Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
 
         SDL_GL_SwapWindow(window);
     }
