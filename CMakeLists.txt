@@ -4,6 +4,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(utils)
+
 project(LearnOpenGL VERSION 1.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
@@ -21,6 +24,7 @@ file(GLOB BUTTERFLIES_SOURCES_C ${CMAKE_CURRENT_SOURCE_DIR} *.c external/glad/sr
 
 add_subdirectory(foundation)
 
+add_subdirectory(examples)
 add_executable(${PROJECT_NAME} "src/main.cpp")
 
 target_link_libraries(${PROJECT_NAME} PUBLIC foundation)
