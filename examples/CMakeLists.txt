@@ -8,7 +8,6 @@ function(add_sub_dirs DIRECTORY)
 
     scan_dirs(DIR ${CMAKE_CURRENT_SOURCE_DIR} LIST SUB_DIRS)
     foreach (CURR_DIR ${SUB_DIRS})
-message("CURR_DIR: ${CURR_DIR}")
         if (EXISTS "${DIRECTORY}/${CURR_DIR}/CMakeLists.txt")
             add_subdirectory(${DIRECTORY}/${CURR_DIR})
             list(APPEND TOTAL_SAMPLE_ID_LIST ${CURR_DIR})

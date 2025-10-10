@@ -22,20 +22,19 @@ include_directories(${CMAKE_SOURCE_DIR}/external/glad/include ${CMAKE_SOURCE_DIR
 
 file(GLOB BUTTERFLIES_SOURCES_C ${CMAKE_CURRENT_SOURCE_DIR} *.c external/glad/src/gl.c)
 
-add_subdirectory(foundation)
-
-add_subdirectory(examples)
-add_executable(${PROJECT_NAME} "src/main.cpp")
-
-target_link_libraries(${PROJECT_NAME} PUBLIC foundation)
-
 # Define a variable for the shader directory relative to the source
 set(SHADERS_DIR "${CMAKE_SOURCE_DIR}/src/shaders")
+
+add_subdirectory(foundation)
+add_subdirectory(examples)
+add_executable(${PROJECT_NAME} "src/main.cpp")
 
 # Add a definition for the C++ code to use
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     SHADERS_DIR="${SHADERS_DIR}"
 )
+
+target_link_libraries(${PROJECT_NAME} PUBLIC foundation)
 
 target_sources(${PROJECT_NAME} PRIVATE external/glad/src/gl.c)
 set_source_files_properties(external/glad/src/gl.c PROPERTIES LANGUAGE C)
